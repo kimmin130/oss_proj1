@@ -1,0 +1,13 @@
+# Python 캐시 파일
+__pycache__/
+*.pyc
+
+# 게임 실행 중 생성되는 파일
+highscore.txt
+
+# 가상환경
+.venv/
+venv/
+
+# 편집기 설정
+.vscode/
