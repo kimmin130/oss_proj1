@@ -17,13 +17,18 @@ def load_high_score():
     """HIGHSCORE_FILE 에서 최고 점수를 읽어 돌려준다."""
     # TODO(F5): 파일에서 최고 점수를 읽어 int 로 반환할 것.
     #           파일이 없거나 내용이 숫자가 아니면 0 을 반환할 것.
-    return 0
+    try:
+        with open(HIGHSCORE_FILE, "r") as file:
+            return int(file.read())
+    except (FileNotFoundError, ValueError):
+        return 0
 
 
 def save_high_score(score):
     """최고 점수를 HIGHSCORE_FILE 에 저장한다."""
     # TODO(F5): score 를 파일에 저장할 것. (다음 실행 때 load_high_score() 로 읽을 수 있게)
-    pass
+    with open(HIGHSCORE_FILE, "w") as file:
+        file.write(str(score))
 
 
 class Game:
@@ -78,7 +83,8 @@ class Game:
                     self.bullets.add(bullet)
                     self.all_sprites.add(bullet)
                 # TODO(F5): 게임 오버 상태에서 R 키를 누르면 self.reset() 으로 새 판을 시작할 것.
-
+                if event.key == pygame.K_r and self.game_over:
+                    self.reset()
     def handle_title_event(self, event):
         """시작 화면의 입력: SPACE 면 새 판 시작, ESC 면 종료. (적 생성·발사 없음)"""
         if event.type == pygame.KEYDOWN:
@@ -132,7 +138,9 @@ class Game:
         """게임 오버 처리."""
         self.game_over = True
         # TODO(F5): 이번 점수가 최고 점수보다 높으면 self.high_score 를 바꾸고 save_high_score() 로 저장할 것.
-
+        if self.score > self.high_score:
+            self.high_score = self.score
+            save_high_score(self.high_score)
     # ---------------- 그리기 ----------------
     def draw_text(self, text, font, color, **position):
         """글자를 화면에 그린다. 예: self.draw_text("Hi", self.font, WHITE, center=(240, 320))"""
@@ -181,7 +189,15 @@ class Game:
             f"SCORE: {self.score}", self.font, WHITE,
             center=(WIDTH // 2, HEIGHT // 2 + 20)
         )
+        self.draw_text(
+            f"HIGH SCORE: {self.high_score}", self.font, WHITE,
+            center=(WIDTH // 2, HEIGHT // 2 + 60)
+        )
 
+        self.draw_text(
+            "Press R to restart", self.font, WHITE,
+            center=(WIDTH // 2, HEIGHT // 2 + 100)
+        )
     # ---------------- 게임 루프 ----------------
     def step(self):
         """한 프레임: 입력 → 갱신 → 그리기."""
